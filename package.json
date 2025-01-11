@@ -6,11 +6,15 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev"
   },
   "dependencies": {
+    "@prisma/client": "^6.2.1",
     "next": "15.1.4",
     "next-auth": "^4.24.11",
+    "prisma": "^6.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

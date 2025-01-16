@@ -1,10 +1,7 @@
-type User = {
-  name: string;
-};
+import { getUsers } from "./fetch/fetch";
 
 export default async function Home() {
-  const response = await fetch(`${process.env.SERVER_URL}/api/users`);
-  const users: User[] = await response.json();
+  const users = await getUsers();
   return (
     <ul>
       {users.map((user) => (

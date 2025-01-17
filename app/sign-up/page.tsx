@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { addUser } from "../actions/actions";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -8,6 +9,7 @@ export default function Login() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    await addUser({ name: username, password });
   };
 
   return (
@@ -19,6 +21,7 @@ export default function Login() {
         height: "100vh",
       }}
     >
+      {/* TODO: actionsに変更 */}
       <form
         onSubmit={handleSubmit}
         style={{

@@ -1,5 +1,7 @@
 "use client";
 
+import { signIn } from "next-auth/react";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 
 export default function Login() {
@@ -8,6 +10,12 @@ export default function Login() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    const res = await signIn("credentials", { username, password });
+    if (!res?.ok) {
+      console.log("ログイン失敗");
+    } else {
+      redirect("/");
+    }
   };
 
   return (

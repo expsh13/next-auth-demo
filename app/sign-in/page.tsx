@@ -1,8 +1,8 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { redirect } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
+import { customSignin } from "../lib/nextAuth";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -10,18 +10,20 @@ export default function Login() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const res = await signIn("credentials", { username, password });
-    if (!res?.ok) {
-      console.log("ログイン失敗");
-    } else {
-      redirect("/");
-    }
+    await customSignin(
+      {
+        username,
+        password,
+      },
+      "/"
+    );
   };
 
   return (
     <div
       style={{
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
@@ -72,6 +74,9 @@ export default function Login() {
           ログイン
         </button>
       </form>
+      <Link className="mt-3" href="/sign-up">
+        サインアップ
+      </Link>
     </div>
   );
 }

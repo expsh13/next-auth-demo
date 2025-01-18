@@ -1,15 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { addUser } from "../actions/actions";
+import { signUpAction } from "./actions/actions";
+import { customSignin } from "../lib/nextAuth";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    await addUser({ name: username, password });
+    try {
+      event.preventDefault();
+      await signUpAction({ username, password });
+      await customSignin(
+        {
+          username,
+          password,
+        },
+        "/"
+      );
+    } catch (error) {
+      console.error("Error signing in:", error);
+      return { success: false, error: "Failed to sign in" };
+    }
   };
 
   return (
@@ -31,7 +44,7 @@ export default function Login() {
           gap: "1rem",
         }}
       >
-        <h2 style={{ textAlign: "center" }}>サインイン</h2>
+        <h2 style={{ textAlign: "center" }}>サインアップ</h2>
         <label>
           ユーザー名:
           <input
@@ -64,7 +77,7 @@ export default function Login() {
             cursor: "pointer",
           }}
         >
-          ログイン
+          サインアップ
         </button>
       </form>
     </div>

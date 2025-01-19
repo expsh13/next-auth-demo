@@ -9,7 +9,6 @@ const UserSchema = z.object({
 type User = z.infer<typeof UserSchema>;
 
 export const getUsers = async (): Promise<User[]> => {
-  // TODO: セッション確認
   const response = await prisma.user.findMany({
     select: {
       name: true, // nameのみ取得

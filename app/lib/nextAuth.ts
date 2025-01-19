@@ -7,7 +7,6 @@ export const customSignin = async (
 ) => {
   try {
     const parsedIdPass = signUpOrSignSchema.parse(idPass);
-    console.log(parsedIdPass);
     await signIn("credentials", {
       username: parsedIdPass.username,
       password: parsedIdPass.password,

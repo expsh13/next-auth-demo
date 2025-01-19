@@ -5,10 +5,10 @@ import { SignUpOrSign, signUpOrSignSchema } from "@/app/schema/schema";
 export async function signUpAction(signUp: SignUpOrSign) {
   try {
     const parsedSingUp = signUpOrSignSchema.parse(signUp);
-    const { name, password } = parsedSingUp;
+    const { username, password } = parsedSingUp;
 
     await prisma.user.create({
-      data: { name, password },
+      data: { name: username, password },
     });
   } catch (error) {
     console.error("Error creating user:", error);

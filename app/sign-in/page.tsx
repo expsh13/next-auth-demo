@@ -1,19 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { customSignin } from "../lib/nextAuth";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SignUpOrSign, signUpOrSignSchema } from "../schema/schema";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpOrSign>({
+    mode: "onChange",
+    resolver: zodResolver(signUpOrSignSchema),
+  });
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const onSubmit = async (data: SignUpOrSign) => {
     await customSignin(
       {
-        username,
-        password,
+        ...data,
       },
       "/"
     );
@@ -30,7 +36,7 @@ export default function Login() {
       }}
     >
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -43,22 +49,32 @@ export default function Login() {
           ユーザー名:
           <input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
             placeholder="ユーザー名を入力"
             style={{ padding: "8px", fontSize: "16px" }}
+            {...register("username")}
           />
+          {errors.username && errors.username.message && (
+            <p role="alert" className="text-red-500">
+              {errors.username.message.toString()}
+            </p>
+          )}
         </label>
+
         <label>
           パスワード:
           <input
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
             placeholder="パスワードを入力"
             style={{ padding: "8px", fontSize: "16px" }}
+            {...register("password")}
           />
+          {errors.password && errors.password.message && (
+            <p role="alert" className="text-red-500">
+              {errors.password.message.toString()}
+            </p>
+          )}
         </label>
+
         <button
           type="submit"
           style={{

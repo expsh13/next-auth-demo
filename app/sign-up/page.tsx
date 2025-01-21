@@ -3,31 +3,37 @@
 import { useState } from "react";
 import { signUpAction } from "./actions/actions";
 import { customSignin } from "../lib/nextAuth";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SignUpOrSign, signUpOrSignSchema } from "../schema/schema";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpOrSign>({
+    mode: "onChange",
+    resolver: zodResolver(signUpOrSignSchema),
+  });
 
   const [error, setError] = useState("");
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const onSubmit = async (data: SignUpOrSign) => {
     setError("");
 
     try {
-      const signUpResult = await signUpAction({ username, password });
+      const signUpResult = await signUpAction(data);
       if (!signUpResult.success) {
         throw new Error(signUpResult.error);
       }
 
-      const signInResult = await customSignin({ username, password }, "/");
+      const signInResult = await customSignin(data, "/");
       if (!signInResult.success) {
         throw new Error(signInResult.error);
       }
-
-      // 成功時の処理を追加（例: 成功メッセージの表示など）
     } catch (err: any) {
-      setError(err.message || "エラーが発生しました。");
+      setError(err || "エラーが発生しました。");
     }
   };
 
@@ -40,9 +46,8 @@ export default function Login() {
         height: "100vh",
       }}
     >
-      {/* TODO: actionsに変更 */}
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -55,22 +60,32 @@ export default function Login() {
           ユーザー名:
           <input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
             placeholder="ユーザー名を入力"
             style={{ padding: "8px", fontSize: "16px" }}
+            {...register("username")}
           />
+          {errors.username && errors.username.message && (
+            <p role="alert" className="text-red-500">
+              {errors.username.message.toString()}
+            </p>
+          )}
         </label>
+
         <label>
           パスワード:
           <input
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
             placeholder="パスワードを入力"
             style={{ padding: "8px", fontSize: "16px" }}
+            {...register("password")}
           />
+          {errors.password && errors.password.message && (
+            <p role="alert" className="text-red-500">
+              {errors.password.message.toString()}
+            </p>
+          )}
         </label>
+
         <button
           type="submit"
           style={{

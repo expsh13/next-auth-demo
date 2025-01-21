@@ -30,7 +30,7 @@ const handler = NextAuth({
         if (!isValid) {
           throw new Error("Invalid password");
         }
-        // JWTのペイロードとして返す
+        // ここで返したオブジェクトが下の jwtコールバックに渡される
         return { id: user.id.toString(), name: user.name };
       },
     }),
@@ -43,7 +43,13 @@ const handler = NextAuth({
     secret: process.env.AUTH_SECRET,
   },
   callbacks: {
-    // JWTが作成もしくは更新されるときに呼ばれる
+    /**
+     * JWTコールバック
+     * NextAuthが「JWTを生成 or 更新」するときに呼ばれるフック
+     * - `user`: ログイン時に authorize から返ってきたユーザーデータ
+     * - `token`: 前回のトークンペイロード。新規ログイン時は空オブジェクト
+     * - `trigger`: "update" などが入る場合があり、セッション更新の契機を判定できる (v4.13+)
+     */
     async jwt({ token, user }) {
       // token: JWTのペイロード, user: 認証に成功したユーザー
       if (user) {
@@ -52,7 +58,11 @@ const handler = NextAuth({
       }
       return token;
     },
-    // セッションがリクエストされるときに呼ばれる
+
+    /**
+     * セッションコールバック
+     * - フロントエンドの useSession から参照できるオブジェクトをカスタマイズ
+     */
     async session({ session, token }) {
       // session: セッション情報, token: JWTのペイロード
       session.user = {

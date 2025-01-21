@@ -1,8 +1,15 @@
 "use server";
+import { ZodError } from "zod";
 import { prisma } from "../../lib/prisma";
 import { SignUpOrSign, signUpOrSignSchema } from "@/app/schema/schema";
+import { FetchError } from "@/app/types/types";
 
-export async function signUpAction(signUp: SignUpOrSign) {
+type FetchSuccess = {
+  success: true;
+};
+type FetchResult = FetchSuccess | FetchError;
+
+export async function signUpAction(signUp: SignUpOrSign): Promise<FetchResult> {
   try {
     const parsedSingUp = signUpOrSignSchema.parse(signUp);
     const { username, password } = parsedSingUp;
@@ -10,8 +17,21 @@ export async function signUpAction(signUp: SignUpOrSign) {
     await prisma.user.create({
       data: { name: username, password },
     });
+
+    return { success: true };
   } catch (error) {
-    console.error("Error creating user:", error);
-    return { success: false, error: "Failed to create user" };
+    if (error instanceof ZodError) {
+      return {
+        success: false,
+        error: "バリデーションエラー",
+        details: error.flatten(),
+      };
+    } else {
+      console.error("Unexpected error:", error);
+      return {
+        success: false,
+        error: "アカウントのサインアップに失敗しました",
+      };
+    }
   }
 }

@@ -8,20 +8,26 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const [error, setError] = useState("");
+
   const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError("");
+
     try {
-      event.preventDefault();
-      await signUpAction({ username, password });
-      await customSignin(
-        {
-          username,
-          password,
-        },
-        "/"
-      );
-    } catch (error) {
-      console.error("Error signing in:", error);
-      return { success: false, error: "Failed to sign in" };
+      const signUpResult = await signUpAction({ username, password });
+      if (!signUpResult.success) {
+        throw new Error(signUpResult.error);
+      }
+
+      const signInResult = await customSignin({ username, password }, "/");
+      if (!signInResult.success) {
+        throw new Error(signInResult.error);
+      }
+
+      // 成功時の処理を追加（例: 成功メッセージの表示など）
+    } catch (err: any) {
+      setError(err.message || "エラーが発生しました。");
     }
   };
 
@@ -80,6 +86,8 @@ export default function Login() {
           サインアップ
         </button>
       </form>
+
+      {error && <div>{error}</div>}
     </div>
   );
 }

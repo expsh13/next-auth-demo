@@ -5,8 +5,10 @@ import { customSignin } from "../lib/nextAuth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignUpOrSign, signUpOrSignSchema } from "../schema/schema";
+import { useState } from "react";
 
 export default function Login() {
+  // TODO: server actions用にconformも検討
   const {
     register,
     handleSubmit,
@@ -16,13 +18,19 @@ export default function Login() {
     resolver: zodResolver(signUpOrSignSchema),
   });
 
+  const [error, setError] = useState("");
+
   const onSubmit = async (data: SignUpOrSign) => {
-    await customSignin(
+    setError("");
+    const res = await customSignin(
       {
         ...data,
       },
       "/"
     );
+    if (!res.success) {
+      setError(res.error);
+    }
   };
 
   return (
@@ -93,6 +101,8 @@ export default function Login() {
       <Link className="mt-3" href="/sign-up">
         サインアップ
       </Link>
+
+      {error && <div>{error}</div>}
     </div>
   );
 }

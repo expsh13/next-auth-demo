@@ -1,7 +1,7 @@
-import { getUsers } from "./fetch/fetch";
+import { cacheGetUsers } from "./fetch/fetch";
 
 export default async function Home() {
-  const res = await getUsers();
+  const res = await cacheGetUsers();
 
   if (!Array.isArray(res)) {
     return <div>エラーが発生しました</div>;

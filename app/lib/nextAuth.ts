@@ -1,3 +1,5 @@
+"client-only";
+
 import { signIn } from "next-auth/react";
 import { SignUpOrSign, signUpOrSignSchema } from "../schema/schema";
 import { FetchError } from "../types/types";

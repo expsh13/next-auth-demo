@@ -1,41 +1,21 @@
 "use client";
 
-import { useState } from "react";
 import { signUpAction } from "./actions/actions";
-import { customSignin } from "../lib/nextAuth";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { SignUpOrSign, signUpOrSignSchema } from "../schema/schema";
+import { useForm } from "@conform-to/react";
+import { signUpOrSignSchema } from "../schema/schema";
+import { parseWithZod } from "@conform-to/zod";
+import { useActionState } from "react";
 
-export default function Login() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SignUpOrSign>({
-    mode: "onChange",
-    resolver: zodResolver(signUpOrSignSchema),
+export default function SignUp() {
+  const [lastResult, action] = useActionState(signUpAction, undefined);
+  const [form, fields] = useForm({
+    lastResult,
+    // クライアントのバリデーション検証
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema: signUpOrSignSchema });
+    },
+    shouldValidate: "onInput",
   });
-
-  const [error, setError] = useState("");
-
-  const onSubmit = async (data: SignUpOrSign) => {
-    setError("");
-
-    try {
-      const signUpResult = await signUpAction(data);
-      if (!signUpResult.success) {
-        throw new Error(signUpResult.error);
-      }
-
-      const signInResult = await customSignin(data, "/");
-      if (!signInResult.success) {
-        throw new Error(signInResult.error);
-      }
-    } catch (err: any) {
-      setError(err || "エラーが発生しました。");
-    }
-  };
 
   return (
     <div
@@ -47,7 +27,9 @@ export default function Login() {
       }}
     >
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        id={form.id}
+        onSubmit={form.onSubmit}
+        action={action}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -62,11 +44,11 @@ export default function Login() {
             type="text"
             placeholder="ユーザー名を入力"
             style={{ padding: "8px", fontSize: "16px" }}
-            {...register("username")}
+            name={fields.username.name}
           />
-          {errors.username && errors.username.message && (
+          {fields.username.errors && (
             <p role="alert" className="text-red-500">
-              {errors.username.message.toString()}
+              {fields.username.errors[0]}
             </p>
           )}
         </label>
@@ -77,11 +59,11 @@ export default function Login() {
             type="password"
             placeholder="パスワードを入力"
             style={{ padding: "8px", fontSize: "16px" }}
-            {...register("password")}
+            name={fields.password.name}
           />
-          {errors.password && errors.password.message && (
+          {fields.password.errors && (
             <p role="alert" className="text-red-500">
-              {errors.password.message.toString()}
+              {fields.password.errors[0]}
             </p>
           )}
         </label>
@@ -102,7 +84,7 @@ export default function Login() {
         </button>
       </form>
 
-      {error && <div>{error}</div>}
+      {form.errors && <div>{form.errors[0]}</div>}
     </div>
   );
 }

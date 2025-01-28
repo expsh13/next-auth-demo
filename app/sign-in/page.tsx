@@ -7,8 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SignUpOrSign, signUpOrSignSchema } from "../schema/schema";
 import { useState } from "react";
 
-export default function Login() {
-  // TODO: server actions用にconformも検討
+export default function SignIn() {
   const {
     register,
     handleSubmit,

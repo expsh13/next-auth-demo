@@ -5,7 +5,6 @@ import { parseWithZod } from "@conform-to/zod";
 import { redirect } from "next/navigation";
 
 export async function signUpAction(prev: unknown, formData: FormData) {
-  debugger;
   const submission = parseWithZod(formData, { schema: signUpOrSignSchema });
   if (submission.status !== "success") {
     return submission.reply();

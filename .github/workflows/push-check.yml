@@ -1,0 +1,31 @@
+name: Push Check
+
+on: [push]
+
+jobs:
+  lint-and-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      # リポジトリをチェックアウト
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Node.js をセットアップ
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20" # プロジェクトで使用している Node.js のバージョンを指定
+
+      # パッケージをインストール
+      - name: Install dependencies
+        run: npm install
+
+      # リンターを実行 (例: ESLint)
+      - name: Run Linter
+        run: npm run lint
+
+      # テストを実行 (例: Jest)
+      - name: Run Tests
+        run: npm test

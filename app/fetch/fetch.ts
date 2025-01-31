@@ -1,7 +1,6 @@
 import "server-only";
-import { z, ZodError } from "zod";
+import { z } from "zod";
 import { prisma } from "../lib/prisma";
-import { FetchError } from "../types/types";
 import { cache } from "react";
 
 const UserSchema = z.object({
@@ -10,36 +9,19 @@ const UserSchema = z.object({
 
 type User = z.infer<typeof UserSchema>;
 
-export type FetchResult = User[] | FetchError;
-
-const getUsers = async (): Promise<FetchResult> => {
-  try {
-    const response = await prisma.user.findMany({
-      select: {
-        name: true, // nameのみ取得
-      },
-    });
-    if (!response) {
-      throw new Error("Failed to fetch users");
-    }
-
-    const parsedUsers = z.array(UserSchema).parse(response);
-
-    return parsedUsers;
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return {
-        success: false,
-        error: "バリデーションエラー",
-        details: error.flatten(),
-      };
-    } else {
-      return {
-        success: false,
-        error: "データの取得に失敗しました",
-      };
-    }
+const getUsers = async (): Promise<User[]> => {
+  const response = await prisma.user.findMany({
+    select: {
+      name: true, // nameのみ取得
+    },
+  });
+  if (!response) {
+    throw new Error("Failed to fetch users");
   }
+
+  const parsedUsers = z.array(UserSchema).parse(response);
+
+  return parsedUsers;
 };
 
 export const cacheGetUsers = cache(getUsers);

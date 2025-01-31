@@ -1,6 +1,9 @@
 import { cacheGetUsers } from "./fetch/fetch";
+import { verifySession } from "./utils/verifySession";
 
 export default async function Home() {
+  await verifySession();
+
   const res = await cacheGetUsers();
 
   if (!Array.isArray(res)) {

@@ -18,9 +18,12 @@ export default function SignIn() {
   });
 
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data: SignUpOrSign) => {
     setError("");
+    setIsLoading(true);
+
     const res = await customSignin(
       {
         ...data,
@@ -30,6 +33,7 @@ export default function SignIn() {
     if (!res.success) {
       setError(res.error);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -84,10 +88,11 @@ export default function SignIn() {
 
         <button
           type="submit"
+          disabled={isLoading}
           style={{
             padding: "10px",
             fontSize: "16px",
-            backgroundColor: "#007BFF",
+            backgroundColor: isLoading ? "#CCCCCC" : "#007BFF",
             color: "#FFF",
             border: "none",
             borderRadius: "4px",
